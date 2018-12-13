@@ -78,6 +78,9 @@ class VirtualMachine extends EventEmitter {
         this.runtime.on(Runtime.BLOCK_GLOW_OFF, glowData => {
             this.emit(Runtime.BLOCK_GLOW_OFF, glowData);
         });
+        this.runtime.on(Runtime.PROJECT_START, () => {
+            this.emit(Runtime.PROJECT_START);
+        });
         this.runtime.on(Runtime.PROJECT_RUN_START, () => {
             this.emit(Runtime.PROJECT_RUN_START);
         });
@@ -936,12 +939,7 @@ class VirtualMachine extends EventEmitter {
             const restoreSprite = () => spritePromise.then(spriteBuffer => this.addSprite(spriteBuffer));
             // Remove monitors from the runtime state and remove the
             // target-specific monitored blocks (e.g. local variables)
-            this.runtime.requestRemoveMonitorByTargetId(targetId);
-            const targetSpecificMonitorBlockIds = Object.keys(this.runtime.monitorBlocks._blocks)
-                .filter(key => this.runtime.monitorBlocks._blocks[key].targetId === targetId);
-            for (const blockId of targetSpecificMonitorBlockIds) {
-                this.runtime.monitorBlocks.deleteBlock(blockId);
-            }
+            target.deleteMonitors();
             const currentEditingTarget = this.editingTarget;
             for (let i = 0; i < sprite.clones.length; i++) {
                 const clone = sprite.clones[i];
@@ -1410,6 +1408,11 @@ class VirtualMachine extends EventEmitter {
             const variable = target.lookupVariableById(variableId);
             if (variable) {
                 variable.value = value;
+
+                if (variable.isCloud) {
+                    this.runtime.ioDevices.cloud.requestUpdateVariable(variable.name, variable.value);
+                }
+
                 return true;
             }
         }
