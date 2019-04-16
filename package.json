@@ -45,7 +45,7 @@
     "nets": "3.2.0",
     "@bbge/parser": "0.0.1-prerelease.20190328224325",
     "scratch-sb1-converter": "0.2.6",
-    "scratch-translate-extension-languages": "0.0.20181205140428",
+    "scratch-translate-extension-languages": "0.0.20190416132834",
     "socket.io-client": "2.0.4",
     "text-encoding": "0.6.4",
     "worker-loader": "^1.1.1"
